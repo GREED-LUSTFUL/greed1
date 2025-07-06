@@ -1,16 +1,18 @@
 from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
+import gzip
 
 app = Flask(__name__)
-model = joblib.load('flight_delay_model.pkl')
+
+# ✅ Load the model from a compressed gzip file
+with gzip.open('flight_delay_model.pkl.gz', 'rb') as f:
+    model = joblib.load(f)
 
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
-    # Expect keys: AIRLINE, ORIGIN_AIRPORT, DESTINATION_AIRPORT, DISTANCE, SCHEDULED_DEPARTURE
     df = pd.DataFrame([data])
-    # No need to re-encode if you send already encoded features, or replicate LabelEncoder logic here.
     pred = model.predict(df)[0]
     prob = float(model.predict_proba(df)[0][1])
     return jsonify({'delayed': bool(pred), 'confidence': prob})
