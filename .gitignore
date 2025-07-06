@@ -1,0 +1,3 @@
+# Ignore model binaries
+flight_delay_model.pkl
+flight_delay_model.pkl.gz
