@@ -1,13 +1,19 @@
 import os, joblib, pandas as pd, requests
 from flask import Flask, request, jsonify
 
+MODEL_URL = "https://huggingface.co/greed36/intelliflight-delay-model/resolve/main/flight_delay_model.pkl"
+MODEL_PATH = "flight_delay_model.pkl"
+
 # Download at startup
-if not os.path.exists('flight_delay_model.pkl'):
-    # shell out to your script
-    os.system('./download_model.sh')
+if not os.path.exists(MODEL_PATH):
+    print("⬇️ Downloading model from Hugging Face…")
+    r = requests.get(MODEL_URL)
+    with open(MODEL_PATH, 'wb') as f:
+        f.write(r.content)
+    print("✅ Model downloaded")
 
 # Load model
-with open('flight_delay_model.pkl', 'rb') as f:
+with open(MODEL_PATH, 'rb') as f:
     model = joblib.load(f)
 
 app = Flask(__name__)
