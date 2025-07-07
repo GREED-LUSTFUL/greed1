@@ -1,1 +1,1 @@
-web: python predict.py
+web: ./download_model.sh && gunicorn app:app
