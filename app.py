@@ -1,20 +1,20 @@
-import os, joblib, pandas as pd, requests
+import os
+import joblib
+import pandas as pd
 from flask import Flask, request, jsonify
 
-MODEL_URL = "https://huggingface.co/greed36/intelliflight-delay-model/resolve/main/flight_delay_model.pkl"
 MODEL_PATH = "flight_delay_model.pkl"
+MODEL_URL = "https://huggingface.co/greed36/intelliflight-delay-model/resolve/main/flight_delay_model.pkl"
 
-# Download at startup
+# Download model if not present
 if not os.path.exists(MODEL_PATH):
-    print("⬇️ Downloading model from Hugging Face…")
-    r = requests.get(MODEL_URL)
-    with open(MODEL_PATH, 'wb') as f:
-        f.write(r.content)
-    print("✅ Model downloaded")
+    import urllib.request
+    print("⬇️ Downloading model...")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+    print("✅ Model downloaded.")
 
 # Load model
-with open(MODEL_PATH, 'rb') as f:
-    model = joblib.load(f)
+model = joblib.load(MODEL_PATH)
 
 app = Flask(__name__)
 
@@ -29,3 +29,4 @@ def predict():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port)
+g
